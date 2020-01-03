@@ -11,15 +11,12 @@ __RESET:
 	B . /* FIQ */
 
 RESET_HANDLER:
-    # Setup user stack (shared with system)
-	LDR		SP, =stack_top
-
-	# Switch to user mode
-	MOV		r1, 0x10
-	MSR		SPSR, r1
-	MOVS	PC, r0
-	BL		usermode_function
-	B		.
+    MSR CPSR_c, 0x13 /* Supervisor mode */
+    LDR SP, =stack_top
+    MSR CPSR_c, 0x10 /* User mode */
+    LDR SP, =usr_stack_top
+    BL  usermode_function
+    B   .
 
 SWI_HANDLER:
 	PUSH	{LR}
